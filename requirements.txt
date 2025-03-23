@@ -3,9 +3,10 @@ jupyter
 pandas
 numpy
 openai
-langchainhub
-langchain-openai
 langchain
+langchainhub
+langchain-experimental
+langchain-openai
 langchain-community
 faiss-cpu
 gradio
