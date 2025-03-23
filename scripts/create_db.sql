@@ -1,13 +1,16 @@
-# mysql -uroot -p<password> < create_db.sql
+# export USER_PASSWORD='<secret>';envsubst < create_db.sql | mysql --local-infile=1 -uroot -p
+# mysql --local-infile=1 -uroot -p<password> < create_db.sql
+SET GLOBAL local_infile = 1;  # TODO: not sure if this needs to be execute beforehand
+
 DROP DATABASE IF EXISTS finquery;
 DROP USER IF EXISTS finuser@localhost;
 CREATE DATABASE finquery;
-CREATE USER finuser@localhost identified by 'fu';
+CREATE USER finuser@localhost identified by '$USER_PASSWORD';
 GRANT ALL PRIVILEGES ON finquery.* TO finuser@localhost;
 FLUSH PRIVILEGES;
 
 USE finquery;
-CREATE TABLE transactions (
+CREATE TABLE financial_transactions (
     transaction_id BIGINT NOT NULL PRIMARY KEY,
     date DATE,
     customer_id BIGINT NOT NULL,
@@ -36,3 +39,19 @@ CREATE TABLE accounting_transactions (
     Failed_Attempts INT,
     IP_Region VARCHAR(100)
 );
+
+LOAD DATA LOCAL INFILE '/Users/ericmelz/Data/code/finquery/data/financial_transactions.csv'
+INTO TABLE financial_transactions
+FIELDS TERMINATED BY ','
+ENCLOSED BY '"'
+LINES TERMINATED BY '\n'
+IGNORE 1 LINES
+(transaction_id, date, customer_id, amount, type, description);
+
+LOAD DATA LOCAL INFILE '/Users/ericmelz/Data/code/finquery/data/accounting_transactions.csv'
+INTO TABLE accounting_transactions
+FIELDS TERMINATED BY ','
+ENCLOSED BY '"'
+LINES TERMINATED BY '\n'
+IGNORE 1 LINES
+(transaction_id, date, account_number, transaction_type, amount, currency, counterparty, category, payment_method, risk_incident, risk_type, incident_severity, error_code, user_id, system_latency, login_frequency, failed_attempts, ip_region);
