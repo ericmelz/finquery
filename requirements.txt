@@ -21,7 +21,7 @@ tavily-python
 gradio_client
 tiktoken
 sqlalchemy
-mysql-connector-python
 streamlit
 plotly
 tabulate
+crewai
