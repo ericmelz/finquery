@@ -40,6 +40,17 @@ CREATE TABLE accounting_transactions (
     IP_Region VARCHAR(100)
 );
 
+CREATE TABLE sales_data (
+    order_id VARCHAR(10),
+    product_id VARCHAR(10),
+    product_name VARCHAR(100),
+    category VARCHAR(50),
+    quantity INT,
+    unit_price DECIMAL(10, 2),
+    total_price DECIMAL(10, 2),
+    order_date DATE
+);
+
 LOAD DATA LOCAL INFILE '/Users/ericmelz/Data/code/finquery/data/financial_transactions.csv'
 INTO TABLE financial_transactions
 FIELDS TERMINATED BY ','
@@ -55,3 +66,11 @@ ENCLOSED BY '"'
 LINES TERMINATED BY '\n'
 IGNORE 1 LINES
 (transaction_id, date, account_number, transaction_type, amount, currency, counterparty, category, payment_method, risk_incident, risk_type, incident_severity, error_code, user_id, system_latency, login_frequency, failed_attempts, ip_region);
+
+LOAD DATA LOCAL INFILE '/Users/ericmelz/Data/code/finquery/data/sample_sales_data.csv'
+INTO TABLE sales_data
+FIELDS TERMINATED BY ','
+ENCLOSED BY '"'
+LINES TERMINATED BY '\n'
+IGNORE 1 LINES
+(order_id, product_id, product_name, category, quantity, unit_price, total_price, order_date);
