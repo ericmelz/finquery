@@ -68,7 +68,7 @@ def create_agent(db, llm):
         print(f"Failed to create agent: {e}")
         return None
 
-def create_sql_agent():
+def create_sqldb_agent():
     """Build SQL agent"""
     engine, session = initialize_db_connection()
     db = get_sql_database(engine)
@@ -79,7 +79,9 @@ def create_sql_agent():
 def run_query(agent, query):
     """Execute a natural language query and return formatted response."""
     try:
+        print(f"sql_agent.run_query: {query=}")
         response = agent.run(query)
+        print(f"sql_agent.run_query: {response=}")        
         # Format raw SQL output into natural language
         if "No results found" in response:
             return f"Sorry, I couldn't find any data for : '{query}'."
