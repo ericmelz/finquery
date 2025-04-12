@@ -102,6 +102,7 @@ def create_db_agent(db_toolkit, llm):
             toolkit=db_toolkit,
             agent_type=AgentType.ZERO_SHOT_REACT_DESCRIPTION, # React-based reasoning
             verbose=True, # Show intermediate steps
+            handle_parsing_errors=True,
         )
         print("SQL Agent created successfully!")
         return agent
@@ -138,7 +139,7 @@ def create_plotly_agent(repl_tool, llm, prompt):
 # Step 9: Create plotly agent executor
 def create_plotly_executor(agent, tools):    
     try:
-        executor = AgentExecutor(agent=agent, tools=tools)
+        executor = AgentExecutor(agent=agent, tools=tools, handle_parsing_errors=True)
         print("Plotly Executor initialized!")
         return executor
     except Exception as e:
@@ -168,12 +169,16 @@ def create_plotviz_executor():
                                         plotly_executor = create_plotly_executor(plotly_agent, [repl_tool])
                                         if plotly_executor:
                                             def plotviz_executor(query):
-                                                sql_query = query + ".\nGenerate only the SQL code to create this chart.  Do not produce a natural language response."
+                                                # sql_query = query + ".\nGenerate only the SQL code to create this chart.  Do not produce a natural language response."
+                                                # sql_query = query + ".\nGenerate ONLY the SQL code to create this chart.  DO NOT execute the SQL or produce a natural language response."
+                                                # sql_query = query + ".\nGenerate ONLY the SQL code to create this chart.  Do not produce a natural language response.  You must always return valid SQL fenced by a markdown code block. Do not return any additional text."
+                                                sql_query = query + ".\nGenerate only the SQL code to create this chart.  Do not produce a natural language response.  Ensure the Sql query is fenced in bacticks.  For example, ```sql\nSELECT order_date FROM sales_data;\n```"
+                                                
                                                 print(f"*** sql_query:\n {sql_query}")
                                                 sql_response = sql_agent.run(sql_query)
                                                 print(f"*** Sql Response: {sql_response}")
                                                 if '```sql' not in sql_response:
-                                                    print("*** ERROR: was expecting ```sql in Sql Response but it's not there!!!")
+                                                    raise Exception("*** ERROR: was expecting ```sql in Sql Response but it's not there!!!")
                                                 sql_code = sql_response.split('```sql')[1].split('```')[0].strip()
                                                 print(f"*** Sql code:\n{sql_code}\n***")
                                                 with engine.connect() as connection:
@@ -184,6 +189,8 @@ def create_plotviz_executor():
                                                 print(f"*** Plotly Query:\n{plotly_query}\n***")
                                                 plotly_response = plotly_executor.invoke({'input': plotly_query})['output']
                                                 print(f"*** Plotly Response: {plotly_response}")
+                                                if '```python' not in plotly_response:
+                                                    raise Exception("*** ERROR: was expecting ```python in plotly_esponse but it's not there!!!")
                                                 plotly_code = plotly_response.split('```python')[1].split('```')[0].strip()
                                                 return plotly_code
                                             return plotviz_executor
