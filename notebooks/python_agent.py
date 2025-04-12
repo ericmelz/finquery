@@ -190,4 +190,8 @@ def create_plotviz_executor():
     except Exception as e:
         print(f"Failed to create plotviz executor: {e}")
     return None
+
+
+def run_visualization(plotviz_executor, query):
+    return plotviz_executor(query)
     

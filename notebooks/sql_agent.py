@@ -68,6 +68,13 @@ def create_agent(db, llm):
         print(f"Failed to create agent: {e}")
         return None
 
+def create_sql_agent():
+    """Build SQL agent"""
+    engine, session = initialize_db_connection()
+    db = get_sql_database(engine)
+    llm = initialize_llm()
+    return create_agent(db, llm)
+
 # Step 5: Process Query and Format Output
 def run_query(agent, query):
     """Execute a natural language query and return formatted response."""
