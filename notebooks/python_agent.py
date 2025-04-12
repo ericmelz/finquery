@@ -1,3 +1,14 @@
+from sqlalchemy import create_engine, text
+from sqlalchemy.orm import sessionmaker
+from langchain_openai import ChatOpenAI
+from langchain_community.utilities import SQLDatabase
+from langchain_community.agent_toolkits import SQLDatabaseToolkit
+from langchain.agents import create_sql_agent, AgentType, create_openai_functions_agent, AgentExecutor
+from langchain_experimental.tools import PythonREPLTool
+from langchain import hub
+import pandas as pd
+from constants import DB_HOST, DB_PORT, DB_USER, DB_PASS, DB_NAME, OPENAI_API_KEY, OPENAI_LLM_MODEL
+
 # Step 1: Set up database connection with SQLAlchemy
 def initialize_db_connection():
     """Initialize SQLAlchemy engine and session for MySQL database."""
@@ -115,8 +126,8 @@ def create_plotly_prompt():
 # Step 8: Create Plotly Agent
 def create_plotly_agent(repl_tool, llm, prompt):
     """Build SQL+Viz agent with LangChain toolkit."""
+    tools = [repl_tool]
     try:
-        tools = [repl_tool]
         agent = create_openai_functions_agent(llm, tools, prompt)
         print("Plotly Agent initialized!")
         return agent
@@ -125,7 +136,7 @@ def create_plotly_agent(repl_tool, llm, prompt):
     return None
 
 # Step 9: Create plotly agent executor
-def create_plotly_executor(agent, tools):
+def create_plotly_executor(agent, tools):    
     try:
         executor = AgentExecutor(agent=agent, tools=tools)
         print("Plotly Executor initialized!")
