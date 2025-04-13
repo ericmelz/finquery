@@ -15,7 +15,7 @@ def initialize_presentation_llm():
         return None
 
 
-def format_output(query, sql_result=None, viz_result=None):
+def format_output(question, sql_result=None, viz_result=None):
     """Format SQL and/or Visualization outputs into a readable summary."""
     llm = initialize_presentation_llm()
     if not llm:
@@ -23,16 +23,16 @@ def format_output(query, sql_result=None, viz_result=None):
 
     try:
         prompt = f"""
-        Given the query: '{query}'
-        SQL result: {sql_result if sql_result else 'None'}
-        Visualization code: {viz_result if viz_result else 'None'}
+        Given the natural language question: '{question}'
+        {', and the sql result: ' + sql_result + ' ' if sql_result else ''}
+        {', and the plotly visualization code: ' + viz_result + ' ' if viz_result else ''}
         Generate a concise, readable summary for a non-technical user. Include natural language explanations
         and, if visualization code is provided, a brief description of what it shows.        
         """
         response = llm.invoke(prompt).content
-        return f"Summary for '{query}:\n{response}"
+        return f"Summary for '{question}:\n{response}"
     except Exception as e:
-        return f"Error formatting output for '{query}': {e}"
+        return f"Error formatting output for '{question}': {e}"
 
 
 # Test the Presentation Agent
