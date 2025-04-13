@@ -25,14 +25,7 @@ def rule_based_router(question):
 
 # --- Routing Option 2: AI-Powered Router ---
 def classify_intent(query):
-    """Classify intent.  This returns a chatty response"""
-    llm = ChatOpenAI(model="gpt-4o-mini", api_key=OPENAI_API_KEY, temperature=0)
-    prompt = f"Classify this query as 'SQL', 'Visualization', or 'Both': {query}'"
-    intent = llm.invoke(prompt).content.lower()
-    return intent
-
-def classify_intent_no_fluff(query):
-    """Classify intent.  This returns a concise response"""
+    """Classify the intended presentation style of the query."""
     llm = ChatOpenAI(model="gpt-4o-mini", api_key=OPENAI_API_KEY, temperature=0)
     prompt = f"""
     Classify "Query" as 'SQL', 'Visualization', or 'Both'.  
@@ -43,25 +36,25 @@ def classify_intent_no_fluff(query):
     intent = llm.invoke(prompt).content.lower()
     return intent
 
-def ai_powered_router(query):
+def ai_powered_router(question):
     """Use LLM to classify query intent and route with standalone Presntation Agent."""
-    sql_agent = create_sqldb_agent()
-    viz_agent = create_plotviz_executor()
+    sql_agent = DBAgent()
+    viz_agent = PlotlyAgent(sql_agent)
 
-    prompt = f"Classify this query as 'SQL', 'Visualization', or 'Both': {query}'"
-    intent = classify_intent_no_fluff(query)
+    prompt = f"Classify this query as 'SQL', 'Visualization', or 'Both': {question}'"
+    intent = classify_intent(question)
 
-    intent = intent.lower()
     print(f'*** presentation intent={intent}')
-    if intent == 'both':
-        sql_result = run_query(sql_agent, query)
-        viz_result = run_visualization(viz_agent, query)
-        return format_output(query, sql_result, viz_result)
+    if intent == 'sql':
+        sql_query = sql_agent.generate_sql(question)
+        df, markdown = sql_agent.exec_and_render(sql_query)
+        return format_output(question, sql_result=markdown, viz_result=None)
     elif intent == 'visualization':
-        viz_result = run_visualization(viz_agent, query)
-        return format_output(query, None, viz_result)
-    elif intent == 'sql':
-        sql_result = run_query(sql, agent)
-        return format_output(query, sql_result)
+        sql_query, python_code = viz_agent.generate_plotly_code(question)
+        return format_output(question, sql_result=None, viz_result=python_code)
+    elif intent == 'both':
+        sql_query, python_code = viz_agent.generate_plotly_code(question)
+        df, markdown = sql_agent.exec_and_render(sql_query)
+        return format_output(question, sql_result=markdown, viz_result=python_code)
     else:
         raise Exception(f"Unknown intent: {intent}")
