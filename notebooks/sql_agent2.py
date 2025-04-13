@@ -72,10 +72,10 @@ class DBAgent:
         return result["query"]
 
     def exec_and_render(self, sql):
-        """Execute sql and return response as markdown"""
+        """Execute sql and return response as a dataframe and the dataframe's markdown"""
         with self.engine.connect() as connection:
             df = pd.read_sql(sql=text(sql), con=connection)
             if df.empty:
-                return '**No Results**'
+                return None, '**No Results**'
             else:
-              return df.head().to_markdown()
+              return df, df.head().to_markdown()
