@@ -15,7 +15,6 @@ if "chat_history" not in st.session_state:
 if "connection_status" not in st.session_state:
     st.session_state.connection_status = "Not connected.  Provide credentials and click the button in the sidebar."
 
-
 # Sidebar: Database Configuration
 with st.sidebar:
     st.header("DATABASE CONFIGURATION")
@@ -46,11 +45,18 @@ with st.sidebar:
     else:
         st.warning(st.session_state.connection_status)
 
-
 # Main window
 st.title("Finquery")
-st.markdown("This agent can help you with SQL queries and Python code for data analysis. Configure your MySQL database "
-            "connection using the sidebar.")
+st.markdown("""
+This agent can help you with SQL queries and Python code for data analysis. Configure your MySQL database "
+            connection using the sidebar.""")
+st.markdown("Some sample queries:")
+st.markdown("""
+            - What were the top-selling products last month?
+            - Plot a line chart of the monthly sales data
+            - What were the top-selling products of all time?
+            - What is the minimum sale amount?
+            """)
 
 # Reset Chat button
 if st.button("Reset Chat"):
