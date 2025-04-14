@@ -63,24 +63,17 @@ for message in st.session_state.chat_history:
         st.markdown(message["content"])
 
 
-def response_generator():
-    response = random.choice(
-        [
-            "Hello there! How can I assist you today?",
-            "Hi, human! Is there anything I can help you with?",
-            "Do you need help?",
-        ]
-    )
-    for word in response.split():
+def ask(question):
+    answer = st.session_state.orchestrator.ask(question)
+    for word in answer.split():
         yield word + " "
         time.sleep(0.05)
 
 
-if prompt := st.chat_input("What's up?"):
+if prompt_question := st.chat_input("What's up?"):
     with st.chat_message("user"):
-        st.markdown(prompt)
-    st.session_state.chat_history.append({"role": "user", "content": prompt})
-    response = f"You said: {prompt}"
+        st.markdown(prompt_question)
+    st.session_state.chat_history.append({"role": "user", "content": prompt_question})
     with st.chat_message("assistant"):
-        assistant_response = st.write_stream(response_generator())
+        assistant_response = st.write_stream(ask(prompt_question))
     st.session_state.chat_history.append({"role": "assistant", "content": assistant_response})
