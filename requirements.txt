@@ -20,6 +20,7 @@ langchain
 tavily-python
 gradio_client
 tiktoken
+mysql-connector-python
 sqlalchemy
 streamlit
 plotly
