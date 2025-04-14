@@ -8,7 +8,6 @@ def initialize_presentation_llm(model):
             model=model,
             temperature=0.2  # Slightly creative for natural summaries
         )
-        print("Presentation LLM initialized!")
         return llm
     except Exception as e:
         print(f"Failed to initialize Presentation LLM: {e}")

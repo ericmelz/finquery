@@ -1,6 +1,4 @@
 import os
-import random
-import time
 
 import streamlit as st
 from sqlalchemy import create_engine, text
@@ -65,7 +63,6 @@ for message in st.session_state.chat_history:
             st.markdown(message["content"])
         elif message["role"] == "assistant":
             # TODO check df and python - render if they exist
-            print(f'generating ai_rsesponse')
             st.markdown(message["ai_response"].explanation)
         else:
             raise Exception(f"Unknown role: {message['role']}")
@@ -73,7 +70,6 @@ for message in st.session_state.chat_history:
 
 def ask(question):
     answer = st.session_state.orchestrator.ask(question)
-    print(f'{answer=}')
     return answer
 
 
@@ -84,7 +80,5 @@ if prompt_question := st.chat_input("What's up?"):
     with st.chat_message("assistant"):
         with st.spinner("Thinking..."):
             assistant_response = ask(prompt_question)
-        print("received assistant response")
     st.session_state.chat_history.append({"role": "assistant", "ai_response": assistant_response})
-    print("rerunning")
     st.rerun()

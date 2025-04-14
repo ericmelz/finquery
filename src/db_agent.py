@@ -18,7 +18,6 @@ def initialize_db_connection(db_url):
             pool_pre_ping=True  # Ensure active connections
         )
         session = sessionmaker(bind=engine)()
-        print("Database connection established!")
         return engine, session
     except Exception as e:
         print(f"Failed to connect to database: {e}")
@@ -29,7 +28,6 @@ def get_sql_database(engine):
     """Wrap SQLAlchemy engine in LangChain's SQLDatabase."""
     try:
         db = SQLDatabase(engine)
-        print("LangChain SQLDatabase initialized!")
         return db
     except Exception as e:
         print(f"Failed to initialize SQLDatabase: {e}")

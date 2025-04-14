@@ -44,7 +44,6 @@ class Orchestrator:
         """Use LLM to classify query intent and route with standalone Presentation Agent."""
         intent = self.classify_intent(question)
 
-        print(f'*** presentation intent={intent}')
         if intent == 'sql':
             sql_query = self.db_agent.generate_sql(question)
             df, markdown = self.db_agent.exec_and_render(sql_query)
