@@ -8,11 +8,11 @@ from sqlalchemy import create_engine, text
 from sqlalchemy.orm import sessionmaker
 
 
-def initialize_db_connection(db_user, db_pass, db_host, db_port, db_name):
+def initialize_db_connection(db_url):
     """Initialize SQLAlchemy engine and session for MySQL database."""
     try:
         engine = create_engine(
-            f"mysql+mysqlconnector://{db_user}:{db_pass}@{db_host}:{db_port}/{db_name}",
+            db_url,
             # echo=True, # Verbose logging for debugging
             echo=False,  # Verbose logging for debugging
             pool_pre_ping=True  # Ensure active connections
@@ -43,8 +43,8 @@ class QueryOutput(TypedDict):
 
 class DBAgent:
     """Agent for generating and executing SQL"""
-    def __init__(self, db_host, db_port, db_user, db_pass, db_name, model):
-        self.engine, self.session = initialize_db_connection(db_user, db_pass, db_host, db_port, db_name)
+    def __init__(self, db_url, model):
+        self.engine, self.session = initialize_db_connection(db_url)
         self.db = get_sql_database(self.engine)
         self.llm = init_chat_model(model, model_provider="openai")
         self.query_prompt_template = hub.pull("langchain-ai/sql-query-system-prompt")

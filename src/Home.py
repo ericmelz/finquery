@@ -3,9 +3,10 @@ from sqlalchemy import create_engine, text
 import random
 import time
 
+from orchestrator import Orchestrator
 
-if "db_engine" not in st.session_state:
-    st.session_state.db_engine = None
+if "orchestrator" not in st.session_state:
+    st.session_state.orchestrator = None
 if "chat_history" not in st.session_state:
     st.session_state.chat_history = []
 if "connection_status" not in st.session_state:
@@ -22,6 +23,7 @@ with st.sidebar:
     db_host = st.text_input("Host", value=st.secrets["DB_HOST"], key="db_host")
     db_port = st.text_input("Port", value=st.secrets["DB_PORT"], key="db_port")
     db_name = st.text_input("Name", value=st.secrets["DB_NAME"], key="db_name")
+    model = st.secrets["OPENAI_LLM_MODEL"]
 
     if st.button("Save and Connect"):
         try:
@@ -30,7 +32,7 @@ with st.sidebar:
             engine = create_engine(db_url, pool_pre_ping=True)
             with engine.connect() as connection:
                 connection.execute(text("SELECT 1"))
-            st.session_state.db_engine = engine
+            st.session_state.orchestrator = Orchestrator(db_url, model)
             st.session_state.connection_status = "Connected successfully!"
         except Exception as e:
             st.session_state.connection_status = f"Connection failed: {e}"

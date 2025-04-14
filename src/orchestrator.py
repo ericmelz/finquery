@@ -11,8 +11,8 @@ class Orchestrator:
     Main class used by clients to ask and answer questions.
     """
 
-    def __int__(self, db_host, db_port, db_user, db_pass, db_name, model):
-        self.sql_agent = DBAgent(db_host, db_port, db_user, db_pass, db_name, model)
+    def __init__(self, db_url, model):
+        self.sql_agent = DBAgent(db_url, model)
 
     def ask(self, question):
         pass
