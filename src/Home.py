@@ -1,5 +1,8 @@
 import streamlit as st
 from sqlalchemy import create_engine, text
+import random
+import time
+
 
 if "db_engine" not in st.session_state:
     st.session_state.db_engine = None
@@ -32,15 +35,47 @@ with st.sidebar:
         except Exception as e:
             st.session_state.connection_status = f"Connection failed: {e}"
 
+    if "success" in st.session_state.connection_status:
+        st.info(st.session_state.connection_status)
+    else:
+        st.warning(st.session_state.connection_status)
+
 
 # Main window
 st.title("Finquery")
 st.markdown("This agent can help you with SQL queries and Python code for data analysis. Configure your MySQL database "
             "connection using the sidebar.")
 
-if "success" in st.session_state.connection_status:
-    st.info(st.session_state.connection_status)
-else:
-    st.warning(st.session_state.connection_status)
+# Reset Chat button
+if st.button("Reset Chat"):
+    st.session_state.chat_history = []
+    st.session_state.connection_status = "Not connected.  Provide credentials and click the button in the sidebar."
+    st.session_state.db_engine = None
+    st.rerun()
+
+for message in st.session_state.chat_history:
+    with st.chat_message(message["role"]):
+        st.markdown(message["content"])
 
 
+def response_generator():
+    response = random.choice(
+        [
+            "Hello there! How can I assist you today?",
+            "Hi, human! Is there anything I can help you with?",
+            "Do you need help?",
+        ]
+    )
+    for word in response.split():
+        yield word + " "
+        time.sleep(0.05)
+
+
+if prompt := st.chat_input("What's up?"):
+    with st.chat_message("user"):
+        st.markdown(prompt)
+    st.session_state.chat_history.append({"role": "user", "content": prompt})
+    response = f"You said: {prompt}"
+    with st.chat_message("assistant"):
+        assistant_response = st.write_stream(response_generator())
+    st.session_state.chat_history.append({"role": "assistant", "content": assistant_response})
