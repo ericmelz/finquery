@@ -1,6 +1,3 @@
-import os
-
-from dotenv import load_dotenv
 from langchain.chat_models import init_chat_model
 from langchain.prompts import PromptTemplate
 from typing_extensions import Annotated, TypedDict
@@ -10,7 +7,7 @@ from db_agent import DBAgent
 
 class PythonOutput(TypedDict):
     """Generated Python Ccode."""
-    code: Annotated[str, ..., "Syntatically valid Python code."]
+    code: Annotated[str, ..., "Syntactically valid Python code."]
 
 
 class PlotlyAgent:
