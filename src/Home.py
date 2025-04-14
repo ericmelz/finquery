@@ -67,7 +67,6 @@ for message in st.session_state.chat_history:
         elif message["role"] == "assistant":
             ai_response = message["ai_response"]
             if ai_response.python is not None:
-                print(f'---Python---\n{ai_response.python}\n---')
                 local_vars = {}
                 exec(ai_response.python, {"px": px, "go": go, "pd": pd}, local_vars)
                 for var_name, var_value in local_vars.items():
