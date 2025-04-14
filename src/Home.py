@@ -28,7 +28,7 @@ with st.sidebar:
     model = st.secrets["OPENAI_LLM_MODEL"]
     os.environ["OPENAI_API_KEY"] = st.secrets["OPENAI_API_KEY"]
 
-    if st.button("Save and Connect"):
+    if st.button("Connect"):
         try:
             # Create a connection and test it
             db_url = f"mysql+mysqlconnector://{db_user}:{db_pass}@{db_host}:{db_port}/{db_name}"
@@ -82,7 +82,8 @@ if prompt_question := st.chat_input("What's up?"):
         st.markdown(prompt_question)
     st.session_state.chat_history.append({"role": "user", "content": prompt_question})
     with st.chat_message("assistant"):
-        assistant_response = ask(prompt_question)
+        with st.spinner("Thinking..."):
+            assistant_response = ask(prompt_question)
         print("received assistant response")
     st.session_state.chat_history.append({"role": "assistant", "ai_response": assistant_response})
     print("rerunning")
