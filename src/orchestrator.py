@@ -1,4 +1,8 @@
 from db_agent import DBAgent
+from plotly_agent import PlotlyAgent
+from langchain_openai import ChatOpenAI
+
+from presentation_agent import PresentationAgent
 
 
 class Orchestrator:
@@ -12,7 +16,37 @@ class Orchestrator:
     """
 
     def __init__(self, db_url, model):
-        self.sql_agent = DBAgent(db_url, model)
+        self.db_agent = DBAgent(db_url, model)
+        self.plotly_agent = PlotlyAgent(self.db_agent, model)
+        self.presentation_agent = PresentationAgent(model)
+        self.llm = ChatOpenAI(model=model, temperature=0)
+
+    def classify_intent(self, question):
+        """Classify the intended presentation style of the query."""
+        prompt = f"""
+        Classify "Question" as 'SQL', 'Visualization', or 'Both'.  
+        Response with ONLY 'SQL', 'Visualization', or 'Both'.
+        DO NOT return any explanation as to why you chose one of those values.
+        Question: {question}'
+        """
+        intent = self.llm.invoke(prompt).content.lower()
+        return intent
 
     def ask(self, question):
-        pass
+        """Use LLM to classify query intent and route with standalone Presentation Agent."""
+        intent = self.classify_intent(question)
+
+        print(f'*** presentation intent={intent}')
+        if intent == 'sql':
+            sql_query = self.db_agent.generate_sql(question)
+            df, markdown = self.db_agent.exec_and_render(sql_query)
+            return self.presentation_agent.format_output(question, db_result=markdown, plotly_result=None)
+        elif intent == 'visualization':
+            sql_query, python_code = self.plotly_agent.generate_plotly_code(question)
+            return self.presentation_agent.format_output(question, db_result=None, plotly_result=python_code)
+        elif intent == 'both':
+            sql_query, python_code = self.plotly_agent.generate_plotly_code(question)
+            df, markdown = self.db_agent.exec_and_render(sql_query)
+            return self.presentation_agent.format_output(question, db_result=markdown, plotly_result=python_code)
+        else:
+            raise Exception(f"Unknown intent: {intent}")

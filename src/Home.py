@@ -1,7 +1,9 @@
-import streamlit as st
-from sqlalchemy import create_engine, text
+import os
 import random
 import time
+
+import streamlit as st
+from sqlalchemy import create_engine, text
 
 from orchestrator import Orchestrator
 
@@ -24,6 +26,7 @@ with st.sidebar:
     db_port = st.text_input("Port", value=st.secrets["DB_PORT"], key="db_port")
     db_name = st.text_input("Name", value=st.secrets["DB_NAME"], key="db_name")
     model = st.secrets["OPENAI_LLM_MODEL"]
+    os.environ["OPENAI_API_KEY"] = st.secrets["OPENAI_API_KEY"]
 
     if st.button("Save and Connect"):
         try:
