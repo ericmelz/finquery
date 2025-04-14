@@ -58,16 +58,23 @@ if st.button("Reset Chat"):
     st.session_state.db_engine = None
     st.rerun()
 
+# Show message history
 for message in st.session_state.chat_history:
     with st.chat_message(message["role"]):
-        st.markdown(message["content"])
+        if message["role"] == "user":
+            st.markdown(message["content"])
+        elif message["role"] == "assistant":
+            # TODO check df and python - render if they exist
+            print(f'generating ai_rsesponse')
+            st.markdown(message["ai_response"].explanation)
+        else:
+            raise Exception(f"Unknown role: {message['role']}")
 
 
 def ask(question):
     answer = st.session_state.orchestrator.ask(question)
-    for word in answer.split():
-        yield word + " "
-        time.sleep(0.05)
+    print(f'{answer=}')
+    return answer
 
 
 if prompt_question := st.chat_input("What's up?"):
@@ -75,5 +82,8 @@ if prompt_question := st.chat_input("What's up?"):
         st.markdown(prompt_question)
     st.session_state.chat_history.append({"role": "user", "content": prompt_question})
     with st.chat_message("assistant"):
-        assistant_response = st.write_stream(ask(prompt_question))
-    st.session_state.chat_history.append({"role": "assistant", "content": assistant_response})
+        assistant_response = ask(prompt_question)
+        print("received assistant response")
+    st.session_state.chat_history.append({"role": "assistant", "ai_response": assistant_response})
+    print("rerunning")
+    st.rerun()
