@@ -1,12 +1,12 @@
 # export USER_PASSWORD='<secret>';envsubst < create_db.sql | mysql --local-infile=1 -uroot -p
 # mysql --local-infile=1 -uroot -p<password> < create_db.sql
-SET GLOBAL local_infile = 1;  # TODO: not sure if this needs to be execute beforehand
+#SET GLOBAL local_infile = 1;  # TODO: not sure if this needs to be execute beforehand
 
 DROP DATABASE IF EXISTS finquery;
-DROP USER IF EXISTS finuser@localhost;
+DROP USER IF EXISTS finuser@'%';
 CREATE DATABASE finquery;
-CREATE USER finuser@localhost identified by '$USER_PASSWORD';
-GRANT ALL PRIVILEGES ON finquery.* TO finuser@localhost;
+CREATE USER finuser@'%' identified by '$USER_PASSWORD';
+GRANT ALL PRIVILEGES ON finquery.* TO finuser@'%';
 FLUSH PRIVILEGES;
 
 USE finquery;
