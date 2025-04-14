@@ -2,6 +2,9 @@ import os
 
 import streamlit as st
 from sqlalchemy import create_engine, text
+import plotly.express as px
+import plotly.graph_objects as go
+import pandas as pd
 
 from orchestrator import Orchestrator
 
@@ -62,8 +65,18 @@ for message in st.session_state.chat_history:
         if message["role"] == "user":
             st.markdown(message["content"])
         elif message["role"] == "assistant":
-            # TODO check df and python - render if they exist
-            st.markdown(message["ai_response"].explanation)
+            ai_response = message["ai_response"]
+            if ai_response.python is not None:
+                print(f'---Python---\n{ai_response.python}\n---')
+                local_vars = {}
+                exec(ai_response.python, {"px": px, "go": go, "pd": pd}, local_vars)
+                for var_name, var_value in local_vars.items():
+                    if isinstance(var_value, go.Figure):
+                        st.plotly_chart(var_value)
+                        break
+            if ai_response.df is not None:
+                st.dataframe(ai_response.df)
+            st.markdown(ai_response.explanation)
         else:
             raise Exception(f"Unknown role: {message['role']}")
 

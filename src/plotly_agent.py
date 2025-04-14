@@ -19,6 +19,9 @@ Here is a preview of the query result:
 {markdown_table}
 
 Write Python code using Plotly to visualize this data. Do not include explanations—just a single Python code block.
+DO NOT show the figure in the code.  For example be sure NOT to generate fig.show() in the code.  Instead, 
+assign the figure to a variable named fig.
+
 """)
         self.db_agent = db_agent
         self.llm = init_chat_model(model, model_provider="openai")
