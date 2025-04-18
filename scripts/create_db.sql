@@ -6,7 +6,7 @@ DROP DATABASE IF EXISTS finquery;
 DROP USER IF EXISTS finuser@'%';
 CREATE DATABASE finquery;
 CREATE USER finuser@'%' identified by '$USER_PASSWORD';
-GRANT ALL PRIVILEGES ON finquery.* TO finuser@'%';
+GRANT SELECT ON finquery.* TO finuser@'%';
 FLUSH PRIVILEGES;
 
 USE finquery;
